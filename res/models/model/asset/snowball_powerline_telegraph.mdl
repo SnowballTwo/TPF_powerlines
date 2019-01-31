@@ -1,0 +1,54 @@
+function data()
+return {
+	boundingInfo = {
+		bbMax = { 0.3, 1.35, 8.1, },
+		bbMin = { -0.3, -1.35, -1.6, },
+	},
+	collider = {
+		params = {
+			
+		},
+		type = "MESH",
+	},
+	lods = {
+		{
+			children = {
+				{
+					id = "asset/YD_TPOLE_TYP1/YD_TPOLE_TYP1_0.msh",
+					transf = {0, 1, 0, 0, -0, 0, 1, 0, 1, -0, 0, 0, 0, 0, 0, 1, },
+					type = "MESH",
+				}, 
+			},
+			matConfigs = {
+				{ 0, }, 
+			},
+			static = false,
+			visibleFrom = 0,
+			visibleTo = 200,
+		}, {
+			children = {
+				{
+					id = "asset/YD_TPOLE_TYP1/YD_TPOLE_TYP1_1.msh",
+					transf = {0, 1, 0, 0, -0, 0, 1, 0, 1, -0, 0, 0, 0, 0, 0, 1, },
+					type = "MESH",
+				}, 
+			},
+			matConfigs = {
+				{ 0, }, 
+			},
+			static = false,
+			visibleFrom = 200,
+			visibleTo = 2500,
+		}, 
+	},
+	metadata = {
+		availability = {
+			yearFrom = 0,
+			yearTo = 0,
+		},
+		cost = {
+			price = 0,
+		},
+	},
+}
+end

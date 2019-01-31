@@ -1,0 +1,54 @@
+function data()
+return {
+	matConfigs = {
+		{ 0, }, 
+	},
+	subMeshes = {
+		{
+			indices = {
+				normal = {
+					count = 59136,
+					offset = 357760,
+				},
+				position = {
+					count = 59136,
+					offset = 239488,
+				},
+				tangent = {
+					count = 59136,
+					offset = 180352,
+				},
+				uv0 = {
+					count = 59136,
+					offset = 298624,
+				},
+			},
+			materials = {
+				"asset/snowball_powerline_donau.mtl", 
+			},
+		}, 
+	},
+	vertexAttr = {
+		normal = {
+			count = 24432,
+			numComp = 3,
+			offset = 155920,
+		},
+		position = {
+			count = 40608,
+			numComp = 3,
+			offset = 52912,
+		},
+		tangent = {
+			count = 52912,
+			numComp = 4,
+			offset = 0,
+		},
+		uv0 = {
+			count = 62400,
+			numComp = 2,
+			offset = 93520,
+		},
+	},
+}
+end

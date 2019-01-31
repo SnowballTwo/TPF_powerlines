@@ -1,0 +1,67 @@
+local transf = require "transf"
+
+local vec4 = require "vec4"
+local vec2 = require "snowball_powerline_vec2"
+local vec3 = require "snowball_powerline_vec3"
+local mat3 = require "snowball_powerline_mat3"
+local polygon = require "snowball_powerline_polygon"
+local powerline = require "snowball_powerline"
+
+function data()
+    return {
+        type = "ASSET_DEFAULT",
+        buildMode = "SINGLE",
+        categories = {"misc"},
+        availability = {
+            yearFrom = 1848,
+            yearTo = 1849
+        },
+        description = {
+            name = _("patch_title"),
+            description = _("patch_description")
+        },
+        order = 197720502,
+        skipCollision = true,
+        autoRemovable = false,
+        params = {},
+        updateFn = function(params)
+            local result = {
+                models = {},
+                groundFaces = {},
+                cost = 10,
+                bulldozeCost = 10,
+                maintenanceCost = 0
+            }
+            local point1 = params.point1
+            local point2 = params.point2
+            local normal1 = params.normal1
+            local normal2 = params.normal2
+            local configuration = params.configuration
+            local tension = params.tension           
+           
+            if (not point1) or (not point2) or (not normal1) or (not normal2) or (not configuration) then
+                result.models[#result.models + 1] = {
+                    id = "asset/snowball_powerline_finisher.mdl",
+                    transf = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1}
+                }
+                return result
+            end
+               
+            local cPoint1 = {point1[1], point1[2], game.interface.getHeight(point1)}
+            local cPoint2 = {point2[1], point2[2], game.interface.getHeight(point2)}
+            powerline.buildGround(cPoint1, normal1, result)            
+
+            for k = 1, #configuration do
+                powerline.buildCable(cPoint1, cPoint2, normal1, normal2, configuration[k], "asset/snowball_powerline_cable.mdl", tension, result)
+            end
+           
+            result.terrainAlignmentLists = {
+                {
+                    type = "EQUAL",
+                    faces = {}
+                }
+            }
+            return result
+        end
+    }
+end

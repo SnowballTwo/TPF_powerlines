@@ -1,0 +1,240 @@
+local vec2 = require "snowball_powerline_vec2"
+local vec3 = require "snowball_powerline_vec2"
+local polygon = require "snowball_powerline_polygon"
+local powerline = require "snowball_powerline"
+
+local modes = {"plan", "span", "reset"}
+local tensions = { 0.00025, 0.0005, 0.001 }
+
+function data()
+    return {
+        type = "ASSET_TRACK",
+        buildMode = "MULTI",
+        categories = {"power"},
+        availability = {
+            yearFrom = 0,
+            yearTo = 0
+        },
+        description = {
+            name = _("title"),
+            description = _("description")
+        },
+        order = 197720501,
+        skipCollision = true,
+        autoRemovable = false,
+        params = {
+            {
+                key = "snowball_powerline_mode",
+                name = _("snowball_powerline_mode"),
+                values = {_("plan"), _("span"), _("reset")},
+                defaultIndex = 0
+            },
+                    
+            {
+                key = "snowball_powerline_type",
+                name = _("snowball_powerline_type"),
+                values = {_("donau"), _("telegraph") },
+                defaultIndex = 0
+            },
+
+            {
+                key = "snowball_powerline_tension",
+                name = _("snowball_powerline_tension"),
+                values = {_("strong"), _("normal"), _("weak")},
+                defaultIndex = 1
+            }
+        },
+        updateFn = function(params)
+            local result = {
+                models = {},
+                cost = 10,
+                bulldozeCost = 10,
+                maintenanceCost = 0
+            }
+           
+            local mode = modes[params.snowball_powerline_mode + 1]
+            local tension = tensions[params.snowball_powerline_tension + 1]
+            powerline.updateMarkers()
+                        
+            local markers = powerline.markerStore
+            local finishers = powerline.finisherStore          
+            local width = 4
+            local model
+            local configuration = {}
+
+
+           if params.snowball_powerline_type == 0 then
+                -- Donaumast
+                model = "asset/snowball_powerline_donau.mdl"                
+                width = 24
+                configuration = {
+                    --Die Z und X Koordinaten wo die Kabel aufgespannt sind. Wir können hier auch mehrere Masttypen anbieten
+                    --Eine Zeile pro Kabel, Format {Höhe, Abstand von Mitte}
+                    {29.29228, 0.0, 0.4},
+                    {14.20756, -9.33421, 1.1},
+                    {14.20756, 9.33421, 1.1},
+                    {14.20756, 5.09941, 1.1},
+                    {14.20756, -5.09941, 1.1},
+                    {20.65996, 6.65164, 1.1},
+                    {20.65996, -6.65164, 1.1}
+                }
+             --[[elseif params.snowball_powerline_type == 1 then
+                -- Tonnenmast
+                model = "asset/snowball_powerline_barrel.mdl"               
+                width = 16
+                configuration = {                    
+                    {32.83249, -6.189495, 1.4},
+                    {32.83249, 6.189495, 1.4},
+                    {25.00822, -7.55979, 1.4},
+                    {25.00822, 7.55979, 1.4},
+                    {17.21566, 6.17186, 1.4},
+                    {17.21566, -6.17186, 1.4},
+                    {44.02907, 0.0, 0.4},
+                    
+                }
+            elseif params.snowball_powerline_type == 2 then
+                -- Telegraph
+                model = "asset/mp_einebene_1.mdl"
+                width = 11               
+                configuration = {                    
+                    {14.65356,-7.85024 , 1.0},
+                    {14.65356,-5.35261 , 1.0},
+                    {14.65356 ,-2.84987,  1.0},                   
+                    { 14.65356,3.06714, 1.0},
+                    {14.65356, 5.58057, 1.0},
+                    {14.65356, 8.07433, 1.0}
+                }]]--
+            elseif params.snowball_powerline_type == 1 then
+                -- Telegraph
+                model = "asset/snowball_powerline_telegraph.mdl"
+                width = 3               
+                configuration = {                    
+                    {7.248, -1.26627, 0.2}, 
+                    {7.408, -0.856, 0.2},
+                    {7.344, -0.592, 0.2},
+                    {7.408, -0.32, 0.2},
+                    {7.248, 1.26627, 0.2}, 
+                    {7.408, 0.856, 0.2},
+                    {7.344, 0.592, 0.2},
+                    {7.408, 0.32, 0.2},
+
+                    {6.608, -1.26627, 0.2}, 
+                    {6.768, -0.856, 0.2},
+                    {6.704, -0.592, 0.2},
+                    {6.768, -0.32, 0.2},
+                    {6.608, 1.26627, 0.2}, 
+                    {6.768, 0.856, 0.2},
+                    {6.704, 0.592, 0.2},
+                    {6.768, 0.32, 0.2},  
+                }
+            
+            end
+
+            local points = powerline.getPoints(markers)
+            local normals = powerline.getNormals(points)
+            local outline = powerline.getOutline(points, normals, width)
+
+            result.models = {}
+            result.terrainAlignmentLists = {
+                {
+                    type = "EQUAL",
+                    faces = {}
+                }
+            }
+
+            if mode == "plan" then
+                for i = 1, #finishers do
+                    local finisher = finishers[i]
+                    game.interface.bulldoze(finisher.id)
+                end
+
+                powerline.finisherStore = nil
+
+                powerline.buildPylon({0, 0, 0}, {0, 1, 0}, model, result)
+
+                for i = 1, #markers + 1 do
+                    result.models[#result.models + 1] = {
+                        id = "asset/snowball_powerline_marker.mdl",
+                        transf = {4, 0, 0, 0, 0, 4, 0, 0, 0, 0, 4, 0, 0, 0, 0, 1}
+                    }
+                end
+
+                if outline then
+                    embankmentzone = {
+                        polygon = outline,
+                        draw = true,
+                        drawColor = {221 / 255, 203 / 255, 149 / 255, 1.0}
+                    }
+                    game.interface.setZone("embankmentzone", embankmentzone)
+                end
+            elseif mode == "reset" then
+                result.models[#result.models + 1] = {
+                    id = "asset/snowball_powerline_finisher.mdl",
+                    transf = {0.01, 0, 0, 0, 0, 0.01, 0, 0, 0, 0, 0.01, 0, 0, 0, 0, 1}
+                }
+
+                powerline.reset()
+
+            elseif mode == "span" then
+                result.models[#result.models + 1] = {
+                    id = "asset/snowball_powerline_finisher.mdl",
+                    transf = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1}
+                }
+
+                powerline.reset()
+
+                if (not points) or (#points < 2) or (polygon.isSelfIntersecting(outline)) then
+                    return result
+                end
+
+                local player = game.interface.getPlayer()
+
+                local slope = 0.0005
+    
+                for i = 1, #points do
+                    local p = points[i]                  
+                    
+                    local pylon =
+                    game.interface.buildConstruction(
+                    "asset/snowball_powerline_pylon.con",
+                    {
+                        point = points[i],
+                        normal = normals[i],                       
+                        model = model,                        
+                    },
+                    {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1}
+                    )
+
+                    game.interface.setPlayer(pylon, player)
+                end
+                
+                for i = 1, #points - 1 do
+                    local point1 = points[i]
+                    local point2 = points[i + 1]
+                    local normal1 = normals[i]
+                    local normal2 = normals[i + 1]
+    
+                    local cable =
+                    game.interface.buildConstruction(
+                    "asset/snowball_powerline_cable.con",
+                    {
+                        point1 = point1,
+                        point2 = point2,
+                        normal1 = normal1,
+                        normal2 = normal2,
+                        configuration = configuration,                        
+                        tension = tension                       
+                    },
+                    {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1}
+                    )
+
+                    game.interface.setPlayer(cable, player)
+                end                
+            else
+                error("powerline: invalid operation ", mode)
+            end
+
+            return result
+        end
+    }
+end

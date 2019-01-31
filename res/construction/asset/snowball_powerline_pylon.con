@@ -1,0 +1,61 @@
+local transf = require "transf"
+
+local vec4 = require "vec4"
+local vec2 = require "snowball_powerline_vec2"
+local vec3 = require "snowball_powerline_vec3"
+local mat3 = require "snowball_powerline_mat3"
+local polygon = require "snowball_powerline_polygon"
+local powerline = require "snowball_powerline"
+
+function data()
+    return {
+        type = "ASSET_DEFAULT",
+        buildMode = "SINGLE",
+        categories = {"misc"},
+        availability = {
+            yearFrom = 1848,
+            yearTo = 1849
+        },
+        description = {
+            name = _("patch_title"),
+            description = _("patch_description")
+        },
+        order = 197720502,
+        skipCollision = true,
+        autoRemovable = false,
+        params = {},
+        updateFn = function(params)
+            local result = {
+                models = {},
+                groundFaces = {},
+                cost = 10,
+                bulldozeCost = 10,
+                maintenanceCost = 0
+            }
+            local point = params.point
+            local normal = params.normal            
+            local model = params.model
+           
+            local cPoint = {point[1], point[2], game.interface.getHeight(point)}
+            
+            if (not model) or (not point) or (not normal) then
+                result.models[#result.models + 1] = {
+                    id = "asset/snowball_powerline_finisher.mdl",
+                    transf = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1}
+                }
+                return result
+            end
+           
+            powerline.buildPylon(cPoint, normal, model, result)
+            powerline.buildGround(point, normal, result)
+                
+            result.terrainAlignmentLists = {
+                {
+                    type = "EQUAL",
+                    faces = {}
+                }
+            }
+            return result
+        end
+    }
+end

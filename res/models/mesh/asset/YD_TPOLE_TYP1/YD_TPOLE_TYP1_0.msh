@@ -1,0 +1,54 @@
+function data()
+return {
+	matConfigs = {
+		{ 0, }, 
+	},
+	subMeshes = {
+		{
+			indices = {
+				normal = {
+					count = 9312,
+					offset = 40968,
+				},
+				position = {
+					count = 9312,
+					offset = 31656,
+				},
+				tangent = {
+					count = 9312,
+					offset = 50280,
+				},
+				uv0 = {
+					count = 9312,
+					offset = 59592,
+				},
+			},
+			materials = {
+				"asset/YD_TPOLE_MAT.mtl", 
+			},
+		}, 
+	},
+	vertexAttr = {
+		normal = {
+			count = 2748,
+			numComp = 3,
+			offset = 6300,
+		},
+		position = {
+			count = 6300,
+			numComp = 3,
+			offset = 0,
+		},
+		tangent = {
+			count = 18032,
+			numComp = 4,
+			offset = 9048,
+		},
+		uv0 = {
+			count = 4576,
+			numComp = 2,
+			offset = 27080,
+		},
+	},
+}
+end
